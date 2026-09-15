@@ -1,3 +1,8 @@
 # ici les fichiers et dossier que tu ne dois pas partager le .venv et tous les fichiers 
 # qui peuvent être générés
 .venv
+
+# test
+
+
+.env
