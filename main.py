@@ -88,15 +88,12 @@ for article in resultat["feed"]["entry"] : #on se balade dans l'arbre, on veut l
 #print('LE DOCUMENT REMPLIS AVEC TOUTES LES DONNEES : \n\n\n\n\ ',docs)
 
 id=[]
-for i in range (5) :
-        id=[i] 
-id
+for i in range (len(docs)) :
+        id.append(i)
 
 
-
-
-#df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
-#print(df)
+df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
+print(df)
 
 #names = ['id','texte','origine']
 
