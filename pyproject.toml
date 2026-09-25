@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "dotenv>=0.9.9",
     "praw>=8.0.3",
+    "xmltodict>=1.0.4",
 ]
 
 [project.scripts]
