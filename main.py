@@ -126,7 +126,14 @@ for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
 
 df_tree=df_tree[df_tree["nb_caracteres"]>=100]
 print(df_tree)
+####Je teste 
+
+print ("ca va bien" )
 
 #3.4
 chaine_join=" ".join([ligne for ligne in df_tree['text']])
 print(chaine_join)
+
+################Partie 4 :
+#4.1
+                                                                                                                                                                                                                                                                     
