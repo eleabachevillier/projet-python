@@ -8,8 +8,7 @@ import pandas as pd
 from datetime import datetime
 
 from Document import Document
-
-
+from Author import Author
 
 """
 
@@ -49,6 +48,9 @@ docs = []
 origines = []
 documents={}
 i=0
+authors = {}
+
+
 
 for post in posts:
     # Titre toujours présent
@@ -61,11 +63,19 @@ for post in posts:
     docs.append(texte) #mettre dans liste
     origines.append('reddit')
 
-    c_documents = Document (titre,auteur,date,url,texte)#instanciation
-    documents[i]=c_documents#dictionnaire
-    i=i+1
+    c_documents = Document (titre,auteur,date,url,texte)#instanciation 
+    documents[i]=c_documents#dictionnaire 
+    i=i+1    
    
-    #print(documents)
+    if auteur not in authors : ##on fait en 2 fois car plusieurs auteurs pour arxiv et bug
+            authors[auteur] = Author(auteur) #on met l'instance en value de la key auteur (auteur correspondant à l'instance)
+    
+    authors[auteur].add(i, c_documents)
+    
+    
+
+   
+    
 
 
 """
@@ -79,97 +89,119 @@ for texte in docs[:5]: #affiher 5 premiers elem de la liste
 
 
 
-url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=5' 
+url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=5'
 
+data = urllib.request.urlopen(url)  # on appel l'API, permet de faire une requette HTTP
+donnees = data.read().decode('utf-8')
 
+resultat = xmltodict.parse(donnees)  # en liste
 
-data = urllib.request.urlopen(url) #on appel l'API, permet de faire une requette HTTP
-donnees=(data.read().decode('utf-8'))
+for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut le texte uniquement
+    titre = article["title"]
+    date = article["published"]
+    auteurs_article = article["author"]
+    url = article["id"]
+    texte = article["summary"]
 
-resultat = xmltodict.parse(donnees) #en liste
+    c_documents2 = Document(titre,auteurs_article, date, url, texte)#
+    documents[i] = c_documents2  # dictionnaire
+    i = i + 1
 
+    """
+    for auteur in auteurs_article:
+        nom = auteur["name"]
 
-for article in resultat["feed"]["entry"] : #on se balade dans l'arbre, on veut le texte uniquement
-        titre=article["title"]
-        date=article["published"]
-        autheur=article["author"]
-        url=article["id"]
-        texte=article["summary"]
+        if nom not in authors:
+            authors[nom] = Author(nom)
+       
+        authors[nom].add(i, c_documents)
+   """     
 
-        c_documents2 = Document (titre,autheur,date,url,texte)
-        documents[i]=c_documents#dictionnaire
-        i=i+1
-        
-        
-
-        docs.append(texte)
-        origines.append("Arxiv")
-
-print (documents[1])
-print("Nombre de documents :", len(documents))
+    docs.append(texte)
+    origines.append("Arxiv")
 
 ######################Partie 2 : 
-#2.1
+    #2.1
 """
-id=[]
-for i in range (len(docs)) :
-        id.append(i)
-df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
-print(df)
+    id=[]
+    for i in range (len(docs)) :
+            id.append(i)
+    df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
+    print(df)
 
-##2.2
-df.to_csv('articles_tree.csv', sep='\t', index=False)
+    ##2.2
+    df.to_csv('articles_tree.csv', sep='\t', index=False)
 
-#2.3
-
-
-df_tree=pd.read_csv('articles_tree.csv', sep='\t')
+    #2.3
 
 
-
-#####################Partie 3 :
-
-#3.1
-taille=(len(df_tree))
-
-#3.2
-for ligne in df_tree['text'] :   
-    if pd.notna(ligne):  # Vérifie si la ligne n'est pas vide
-        mot = ligne.split(" ")
-        print('mot',len(mot))
-
-        phrases=ligne.split(".")
-        print('phrases',len(phrases))
-    else:
-        print('ligne vide')
-
-
-    #print('caractère',len(ligne),'\n')
-    
-#3.3
-for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
-    if pd.notna(ligne):
-        df_tree.loc[i, "nb_caracteres"] = len(ligne)
-    else:
-        df_tree.loc[i, "nb_caracteres"] = 0
+    df_tree=pd.read_csv('articles_tree.csv', sep='\t')
 
 
 
-df_tree=df_tree[df_tree["nb_caracteres"]>=100]
-print(df_tree)
+    #####################Partie 3 :
+
+    #3.1
+    taille=(len(df_tree))
+
+    #3.2
+    for ligne in df_tree['text'] :   
+        if pd.notna(ligne):  # Vérifie si la ligne n'est pas vide
+            mot = ligne.split(" ")
+            print('mot',len(mot))
+
+            phrases=ligne.split(".")
+            print('phrases',len(phrases))
+        else:
+            print('ligne vide')
 
 
-#3.4
-chaine_join=" ".join([ligne for ligne in df_tree['text']])
-#print(chaine_join)
+        #print('caractère',len(ligne),'\n')
+        
+    #3.3
+    for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
+        if pd.notna(ligne):
+            df_tree.loc[i, "nb_caracteres"] = len(ligne)
+        else:
+            df_tree.loc[i, "nb_caracteres"] = 0
+
+
+
+    df_tree=df_tree[df_tree["nb_caracteres"]>=100]
+    print(df_tree)
+
+
+    #3.4
+    chaine_join=" ".join([ligne for ligne in df_tree['text']])
+    #print(chaine_join)
 """
 
-################Partie 4 :
-#4.
+
+    ################Partie 4 :
+    #4.2 /4.3
+    print (f"toutes les informations de l'instance \n : titre {c_documents.titre}, auteur {c_documents.auteur}, date {c_documents.date}, url {c_documents.url}, texte {c_documents.texte}'\n")
+
+    print("manière avec __str__"\n)
+    print (documents[1])
+    print("Nombre de documents :", len(documents))
+
+    ################Partie 5 :
+    #5.2 /5.3
+
 
 """
-c=Document("bonjour","elea","aujourdhui","www.google.com","ceci est un test") 
-print(c.titre, c.auteur)
-print (c)
+for doc_id,document in documents.items():
+    nom=documents[doc_id].auteur
+    if nom not in authors :
+        authors[nom] = Author(nom) #on met l'instance en value de la key nom (nom correspondant à l'instance)
+
+    authors[nom].add(doc_id, document)
+
+
+for nom, auteur in authors.items():
+    print(nom, ":", auteur.nb_docs, "documents")     
 """
-                                                                                                                                                                                                     
+for nom, auteur in authors.items():
+    print(nom, ":", auteur.nb_docs, "documents")     
+
+####5.4
