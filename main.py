@@ -43,7 +43,6 @@ posts = list(subr.hot(limit=taille_docs))#les articles principaux sur le domaine
 docs = []
 origines = []
 
-
 for post in posts:
     # Titre toujours présent
     texte = post.title.replace("\n", " ") + ". " #on récupere les titres
