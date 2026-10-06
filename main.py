@@ -9,6 +9,7 @@ from datetime import datetime
 
 from Document import Document
 from Author import Author
+from Corpus import Corpus
 
 """
 
@@ -62,16 +63,16 @@ for post in posts:
 
     docs.append(texte) #mettre dans liste
     origines.append('reddit')
-
+    
     c_documents = Document (titre,auteur,date,url,texte)#instanciation 
     documents[i]=c_documents#dictionnaire 
     i=i+1    
-   
+    
     if auteur not in authors : ##on fait en 2 fois car plusieurs auteurs pour arxiv et bug
             authors[auteur] = Author(auteur) #on met l'instance en value de la key auteur (auteur correspondant à l'instance)
     
     authors[auteur].add(i, c_documents)
-    
+   
     
 
    
@@ -98,8 +99,8 @@ resultat = xmltodict.parse(donnees)  # en liste
 
 for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut le texte uniquement
     titre = article["title"]
-    date = article["published"]
     auteurs_article = article["author"]
+    date = article["published"]    
     url = article["id"]
     texte = article["summary"]
 
@@ -107,18 +108,23 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
     documents[i] = c_documents2  # dictionnaire
     i = i + 1
 
-    """
-    for auteur in auteurs_article:
-        nom = auteur["name"]
-
-        if nom not in authors:
-            authors[nom] = Author(nom)
-       
-        authors[nom].add(i, c_documents)
-   """     
-
     docs.append(texte)
     origines.append("Arxiv")
+##IA
+    if isinstance(auteurs_article, dict):
+        auteurs_article = [auteurs_article]
+
+    for nom in auteurs_article:
+        auteur = nom["name"]
+##fin IA
+        if auteur not in authors:
+            authors[auteur] = Author(auteur)
+                 
+        authors[auteur].add(i, c_documents)
+       
+
+    
+ 
 
 ######################Partie 2 : 
     #2.1
@@ -179,29 +185,45 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
 
     ################Partie 4 :
     #4.2 /4.3
-    print (f"toutes les informations de l'instance \n : titre {c_documents.titre}, auteur {c_documents.auteur}, date {c_documents.date}, url {c_documents.url}, texte {c_documents.texte}'\n")
+"""
+print (f"toutes les informations de l'instance \n : titre {c_documents.titre}, auteur {c_documents.auteur}, date {c_documents.date}, url {c_documents.url}, texte {c_documents.texte}'\n")
 
-    print("manière avec __str__"\n)
-    print (documents[1])
-    print("Nombre de documents :", len(documents))
+print("manière avec __str__\n") 
+print (documents[1])
+print("Nombre de documents :", len(documents))
 
     ################Partie 5 :
     #5.2 /5.3
 
-
-"""
-for doc_id,document in documents.items():
-    nom=documents[doc_id].auteur
-    if nom not in authors :
-        authors[nom] = Author(nom) #on met l'instance en value de la key nom (nom correspondant à l'instance)
-
-    authors[nom].add(doc_id, document)
-
-
+ 
 for nom, auteur in authors.items():
-    print(nom, ":", auteur.nb_docs, "documents")     
-"""
-for nom, auteur in authors.items():
-    print(nom, ":", auteur.nb_docs, "documents")     
+    print(nom, ":", auteur.nb_docs, "documents") 
 
-####5.4
+ ####5.4 
+
+nom_recherche=input("Entrez le nom de l'auteur à rechercher : ")
+if nom_recherche in authors:
+     auteur = authors[nom_recherche]
+     print("Nombre de documents produits :", auteur.nb_docs)
+if nom_recherche not in authors:
+     print ("pas trouvé")
+"""
+
+corp_champ= Corpus ("Dans les champs")
+print(corp_champ.nom)
+print(corp_champ.id_documents)
+corp_champ.add(c_documents)
+print (corp_champ.documents)
+print(corp_champ.authors)
+print(corp_champ.id_documents)
+
+
+corp_champ.save_fichier("corpus_article.csv")
+
+#corp_champ.load_fichier("corpus_article.csv")
+corpus=pd.read_csv('corpus_article.csv', sep='\t')
+print (corpus)
+
+
+
+
