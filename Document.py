@@ -10,7 +10,8 @@ class Document :
         self.texte=texte
 
     def __str__(self):
-        return f"le titre du document est : {self.titre} et l'auteur est : {self.auteur}, enfin le texte est : {self.texte} et la date est : {self.date} et l'url est : {self.url}"
+        return f"le titre du document est : {self.titre}"
 
 
 
+    

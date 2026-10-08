@@ -17,12 +17,46 @@ class Corpus :
         doc_id = self.id_documents
         self.id_documents += 1
 
-        nom = doc.auteur
+        #nom = doc.auteur
+        
+       # if isinstance(doc.auteur, dict):
+         #   auteurs_article = [doc.auteur]
+        #else:
+             #auteurs_article = doc.auteur
 
-        if nom not in self.authors:
-            self.authors[nom] = Author(nom)
+       # for auteur in auteurs_article:
+            #nom = auteur["name"] if isinstance(auteur, dict) else auteur
+            
+        #for nom in auteurs_article:
+                #auteur = nom["name"]
 
-        self.authors[nom].add(doc_id, doc)
+      
+        if isinstance(doc.auteur, dict):
+            auteurs_article = [doc.auteur["name"]]
+        elif isinstance(doc.auteur, list):
+            auteurs_article = []
+            for a in doc.auteur:
+                if isinstance(a, dict):
+                    auteurs_article.append(a["name"])
+                else:
+                    auteurs_article.append(a)
+                                    
+        else:
+            auteurs_article = [doc.auteur]
+
+        for nom in auteurs_article:
+            if nom not in self.authors:
+                self.authors[nom] = Author(nom)
+
+            self.authors[nom].add(doc_id, doc)
+           
+
+        #if auteurs_article not in self.authors :
+
+           # self.authors[nom] = Author(nom)
+
+        #self.authors[nom].add(doc_id, doc)
+
     #def trie_date(self, doc):
        # documents_tries = sorted(
       # for 
@@ -35,9 +69,18 @@ class Corpus :
             key=lambda x: x[1].date
             )
             
-            for doc_id, doc in documents_tries[:nombre]:
+            for doc_id, doc in documents_tries[:1]:
                 print(doc)
     #fin IA
+
+    def trie_titre(self, doc):
+                documents_tries = sorted(
+                self.documents.items(),
+                key=lambda x: x[1].date
+                )
+                
+                for doc_id, doc in documents_tries[:1]:
+                    print(doc)
 
     def save_fichier(self, fichier):
         donnees = []
@@ -58,3 +101,7 @@ class Corpus :
     
     #def load_fichier(fichier):
         corpus=pd.read_csv('articles_tree.csv', sep='\t')
+
+
+    def __repr__(self):
+        return f"le nom du corpus est : {self.nom}"

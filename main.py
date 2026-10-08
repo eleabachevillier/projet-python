@@ -17,12 +17,6 @@ from Corpus import Corpus
 #
 
 
-import numpy as np
-import json
-
-import datetime
-
-
 
 
 """
@@ -100,11 +94,12 @@ resultat = xmltodict.parse(donnees)  # en liste
 for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut le texte uniquement
     titre = article["title"]
     auteurs_article = article["author"]
-    date = article["published"]    
+    #date = datetime.fromtimestamp(article["published"])  
+    date = datetime.fromisoformat(article["published"].replace("Z", ""))
     url = article["id"]
     texte = article["summary"]
 
-    c_documents2 = Document(titre,auteurs_article, date, url, texte)#
+    c_documents2 = Document(titre,auteurs_article, date, url, texte)#auteur article est une liste (ou un dictionnaire)
     documents[i] = c_documents2  # dictionnaire
     i = i + 1
 
@@ -149,6 +144,7 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
 
     #3.1
     taille=(len(df_tree))
+    print (f"taille du corpus : {taille}") ##############verif que fonctionne
 
     #3.2
     for ligne in df_tree['text'] :   
@@ -210,19 +206,29 @@ if nom_recherche not in authors:
 """
 
 corp_champ= Corpus ("Dans les champs")
+print(corp_champ.add(c_documents))
+print (c_documents2.url)
+print ("c bon")
+
+corp_champ.add(c_documents2)
+"""
 print(corp_champ.nom)
 print(corp_champ.id_documents)
-corp_champ.add(c_documents)
+
 print (corp_champ.documents)
 print(corp_champ.authors)
 print(corp_champ.id_documents)
+"""
+print (corp_champ.trie_date(corp_champ))
+print (corp_champ.trie_titre(corp_champ)) 
+
 
 
 corp_champ.save_fichier("corpus_article.csv")
 
 #corp_champ.load_fichier("corpus_article.csv")
-corpus=pd.read_csv('corpus_article.csv', sep='\t')
-print (corpus)
+#corpus=pd.read_csv('corpus_article.csv', sep='\t')
+#print (corpus)
 
 
 

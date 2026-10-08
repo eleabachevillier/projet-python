@@ -11,4 +11,4 @@ class Author :
 
 
     def __str__(self):
-        return f"l'auteur est : {self.name} et le nombre de documents est : {self.nb_docs} et la production est : {self.production}"
+        return f"l'auteur est : {self.name} et son nombre de documents est : {self.nb_docs} "
