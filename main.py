@@ -10,6 +10,10 @@ from datetime import datetime
 from Document import Document
 from Author import Author
 from Corpus import Corpus
+from RedditDocument import RedditDocument
+from ArxivDocument import ArxivDocument
+from DocumentFactory import Fabrique
+
 
 """
 
@@ -53,13 +57,16 @@ for post in posts:
     auteur = post.author #str( ) 
     date = datetime.fromtimestamp(post.created_utc)
     url=post.url
-    texte = post.selftext.replace("\n", " ") 
+    texte = post.selftext.replace("\n", " ")
+    num_comments= post.num_comments 
 
     docs.append(texte) #mettre dans liste
     origines.append('reddit')
     
     c_documents = Document (titre,auteur,date,url,texte)#instanciation 
-    documents[i]=c_documents#dictionnaire 
+    doc_Reddit=RedditDocument (titre,auteur,date,url,texte, num_comments)
+    #documents[i]=c_documents#dictionnaire 
+    documents[i]=doc_Reddit
     i=i+1    
     
     if auteur not in authors : ##on fait en 2 fois car plusieurs auteurs pour arxiv et bug
@@ -99,19 +106,34 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
     url = article["id"]
     texte = article["summary"]
 
-    c_documents2 = Document(titre,auteurs_article, date, url, texte)#auteur article est une liste (ou un dictionnaire)
+    if isinstance(auteurs_article, dict):
+        auteurs_article = [auteurs_article]
+
+    for a in auteurs_article :
+        noms = a["name"]
+    auteur = noms[0]
+    coauteurs = noms[1:]
+    #noms = [a["name"] for a in auteurs_article] #pour mettre dans auteur et dans les coauteurs
+    #auteur = noms[0]
+    #coauteurs = noms[1:]
+    
+
+    doc_Arxiv = ArxivDocument(titre,auteurs_article, date, url, texte,coauteurs)#coauteurs
+    c_documents2 = Document(titre,auteurs_article, date, url, texte)
+    # #auteur article est une liste (ou un dictionnaire)
     documents[i] = c_documents2  # dictionnaire
     i = i + 1
 
     docs.append(texte)
     origines.append("Arxiv")
-##IA
+
+
     if isinstance(auteurs_article, dict):
         auteurs_article = [auteurs_article]
 
     for nom in auteurs_article:
         auteur = nom["name"]
-##fin IA
+
         if auteur not in authors:
             authors[auteur] = Author(auteur)
                  
@@ -181,13 +203,14 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
 
     ################Partie 4 :
     #4.2 /4.3
-"""
-print (f"toutes les informations de l'instance \n : titre {c_documents.titre}, auteur {c_documents.auteur}, date {c_documents.date}, url {c_documents.url}, texte {c_documents.texte}'\n")
+
+#print (f"toutes les informations de l'instance \n : titre {c_documents.titre}, auteur {c_documents.auteur}, date {c_documents.date}, url {c_documents.url}, texte {c_documents.texte}'\n")
+print (f"toutes les informations de l'instance \n : titre {doc_Reddit.titre}, auteur {doc_Reddit.auteur}, date {doc_Reddit.date}, url {doc_Reddit.url}, texte {doc_Reddit.texte}, nb_com {num_comments}'\n")
 
 print("manière avec __str__\n") 
 print (documents[1])
 print("Nombre de documents :", len(documents))
-
+"""
     ################Partie 5 :
     #5.2 /5.3
 
@@ -207,20 +230,29 @@ if nom_recherche not in authors:
 
 corp_champ= Corpus ("Dans les champs")
 print(corp_champ.add(c_documents))
-print (c_documents2.url)
-print ("c bon")
+print(corp_champ.add(doc_Reddit))
+print(corp_champ.add(doc_Arxiv))
+print(corp_champ.add(c_documents2))
+
+#print (c_documents2.url)
+
 
 corp_champ.add(c_documents2)
-"""
-print(corp_champ.nom)
-print(corp_champ.id_documents)
+#arxiv_test = ArxivDocument(c_documents2, "louis")
+#print (arxiv_test)
 
-print (corp_champ.documents)
-print(corp_champ.authors)
-print(corp_champ.id_documents)
+#print(corp_champ.nom)
+#print(corp_champ.id_documents)
+
+#print (corp_champ.documents)
+#print(corp_champ.authors)
+print("id doc : ",corp_champ.id_documents)#nb docs dans le corpus selectionné
+#marche avec reddit
 """
 print (corp_champ.trie_date(corp_champ))
+print ("ct trie par date ")
 print (corp_champ.trie_titre(corp_champ)) 
+print ("ct trie par titre ")
 
 
 
@@ -229,7 +261,14 @@ corp_champ.save_fichier("corpus_article.csv")
 #corp_champ.load_fichier("corpus_article.csv")
 #corpus=pd.read_csv('corpus_article.csv', sep='\t')
 #print (corpus)
+reddit = RedditDocument(corp_champ,12)
+"""
 
+doc_Reddit.getType()
+doc_Arxiv.getType()
 
+#print(Corpus() is Corpus())
 
-
+doc_fab = Fabrique.document_factory("arxiv", titre, auteur, date, url, texte,
+                       coauteurs=["Alice", "Bob"])
+corp_champ.add(doc_fab)

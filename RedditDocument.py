@@ -6,10 +6,13 @@ class RedditDocument(Document): # hérite de Animal
         self.nb_commentaires=co_auteurs
 
     def getnb_commentaires(self):
-        return f"le nombre de commentaires est {self.nb_commentaires}"
+        return self.nb_commentaires
     
     def setnb_commentaires(self):
         set.nb_commentaires = nb_commentaires
 
     def crier(self): # surcharge (override)
-        return f"{self.nom} aboie : Ouaf !"
+         return f"[Reddit] {self.titre} - {self.nb_commentaires} commentaires"#mise en forme
+
+    def getType(self):
+        return "Reddit"

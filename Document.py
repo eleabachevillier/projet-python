@@ -8,6 +8,7 @@ class Document :
         self.date=date
         self.url=url
         self.texte=texte
+        self.type = "Document"
 
     def __str__(self):
         return f"le titre du document est : {self.titre}"

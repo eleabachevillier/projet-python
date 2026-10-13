@@ -2,6 +2,16 @@ import pandas as pd
 from Author import Author
 
 
+def singleton(cls):
+    instance = [None]
+    def wrapper(*args, **kwargs):
+        if instance[0] is None:
+            instance[0] = cls(*args, **kwargs)
+        return instance[0]
+    return wrapper
+
+
+@singleton
 class Corpus : 
     "corpus de documents"
 
@@ -69,17 +79,17 @@ class Corpus :
             key=lambda x: x[1].date
             )
             
-            for doc_id, doc in documents_tries[:1]:
+            for doc_id, doc in documents_tries[:5]:
                 print(doc)
     #fin IA
 
     def trie_titre(self, doc):
                 documents_tries = sorted(
                 self.documents.items(),
-                key=lambda x: x[1].date
+                key=lambda x: x[1].titre
                 )
                 
-                for doc_id, doc in documents_tries[:1]:
+                for doc_id, doc in documents_tries[:5]:
                     print(doc)
 
     def save_fichier(self, fichier):
@@ -104,4 +114,9 @@ class Corpus :
 
 
     def __repr__(self):
-        return f"le nom du corpus est : {self.nom}"
+        return f"Corpus (nom='{self.nom}')"
+
+
+    
+        
+    

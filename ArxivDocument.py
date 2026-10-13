@@ -1,10 +1,20 @@
 from Document import Document
 
-class RedditDocument(Document): # hérite de Animal
-    def __init__(self, titre, auteur, date, url, texte,nb_commentaires):
+class ArxivDocument(Document): # hérite de Animal
+    def __init__(self, titre, auteur, date, url, texte,coauteurs):
         super().__init__(titre, auteur, date, url, texte) # constructeur mère
-        self.nb_commentaires=nb_commentaires
+        self.coauteurs=coauteurs
    
    
-    def crier(self): # surcharge (override)
-        return f"{self.nom} aboie : Ouaf !"
+    #surcharge (override)
+    def getCoauteurs(self):
+        return self.coauteurs
+
+    def setCoauteurs(self, coauteurs):
+        self.coauteurs = coauteurs
+
+    def __str__(self):
+        return f"[Arxiv] {self.titre} - {len(self.coauteurs)} coauteurs"#coauteurs : liste
+    
+    def getType(self):
+        return "Arxiv"
