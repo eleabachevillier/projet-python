@@ -30,8 +30,7 @@ from DocumentFactory import Fabrique
 
 #1.1
 
-taille_docs=10
-
+taille_docs=100
 #Récupération de textes depuis Reddit
 reddit = praw.Reddit(
     client_id='m4W3R1MLvrnNI9LTbG35Eg', 
@@ -91,7 +90,7 @@ for texte in docs[:5]: #affiher 5 premiers elem de la liste
 
 
 
-url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=5'
+url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=100'
 
 data = urllib.request.urlopen(url)  # on appel l'API, permet de faire une requette HTTP
 donnees = data.read().decode('utf-8')
@@ -145,60 +144,60 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
 
 ######################Partie 2 : 
     #2.1
-"""
-    id=[]
-    for i in range (len(docs)) :
-            id.append(i)
-    df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
-    print(df)
 
-    ##2.2
-    df.to_csv('articles_tree.csv', sep='\t', index=False)
+id=[]
+for i in range (len(docs)) :
+        id.append(i)
+df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
+print(df)
 
-    #2.3
+##2.2
+df.to_csv('articles_tree.csv', sep='\t', index=False)
 
-
-    df_tree=pd.read_csv('articles_tree.csv', sep='\t')
+#2.3
 
 
-
-    #####################Partie 3 :
-
-    #3.1
-    taille=(len(df_tree))
-    print (f"taille du corpus : {taille}") ##############verif que fonctionne
-
-    #3.2
-    for ligne in df_tree['text'] :   
-        if pd.notna(ligne):  # Vérifie si la ligne n'est pas vide
-            mot = ligne.split(" ")
-            print('mot',len(mot))
-
-            phrases=ligne.split(".")
-            print('phrases',len(phrases))
-        else:
-            print('ligne vide')
-
-
-        #print('caractère',len(ligne),'\n')
-        
-    #3.3
-    for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
-        if pd.notna(ligne):
-            df_tree.loc[i, "nb_caracteres"] = len(ligne)
-        else:
-            df_tree.loc[i, "nb_caracteres"] = 0
+df_tree=pd.read_csv('articles_tree.csv', sep='\t')
 
 
 
-    df_tree=df_tree[df_tree["nb_caracteres"]>=100]
-    print(df_tree)
+#####################Partie 3 :
+
+#3.1
+taille=(len(df_tree))
+print (f"taille du corpus : {taille}") ##############verif que fonctionne
+
+#3.2
+for ligne in df_tree['text'] :   
+    if pd.notna(ligne):  # Vérifie si la ligne n'est pas vide
+        mot = ligne.split(" ")
+        #print('mot',len(mot))
+
+        phrases=ligne.split(".")
+        #print('phrases',len(phrases))
+    #else:
+        #print('ligne vide')
 
 
-    #3.4
-    chaine_join=" ".join([ligne for ligne in df_tree['text']])
-    #print(chaine_join)
-"""
+    #print('caractère',len(ligne),'\n')
+    
+#3.3
+for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
+    if pd.notna(ligne):
+        df_tree.loc[i, "nb_caracteres"] = len(ligne)
+    else:
+        df_tree.loc[i, "nb_caracteres"] = 0
+
+
+
+df_tree=df_tree[df_tree["nb_caracteres"]>=100]
+#print(df_tree)
+
+
+#3.4
+chaine_join=" ".join([ligne for ligne in df_tree['text']])
+#print(chaine_join)
+
 
 
     ################Partie 4 :
@@ -210,7 +209,7 @@ print (f"toutes les informations de l'instance \n : titre {doc_Reddit.titre}, au
 print("manière avec __str__\n") 
 print (documents[1])
 print("Nombre de documents :", len(documents))
-"""
+
     ################Partie 5 :
     #5.2 /5.3
 
@@ -226,33 +225,27 @@ if nom_recherche in authors:
      print("Nombre de documents produits :", auteur.nb_docs)
 if nom_recherche not in authors:
      print ("pas trouvé")
-"""
+
 
 corp_champ= Corpus ("Dans les champs")
-print(corp_champ.add(c_documents))
+#print(corp_champ.add(c_documents))
 print(corp_champ.add(doc_Reddit))
 print(corp_champ.add(doc_Arxiv))
-print(corp_champ.add(c_documents2))
+#print(corp_champ.add(c_documents2))
 
 #print (c_documents2.url)
 
 
-corp_champ.add(c_documents2)
-#arxiv_test = ArxivDocument(c_documents2, "louis")
-#print (arxiv_test)
+#corp_champ.add(c_documents2)
 
-#print(corp_champ.nom)
-#print(corp_champ.id_documents)
 
-#print (corp_champ.documents)
-#print(corp_champ.authors)
+
 print("id doc : ",corp_champ.id_documents)#nb docs dans le corpus selectionné
 #marche avec reddit
-"""
+
 print (corp_champ.trie_date(corp_champ))
-print ("ct trie par date ")
 print (corp_champ.trie_titre(corp_champ)) 
-print ("ct trie par titre ")
+
 
 
 
@@ -261,10 +254,10 @@ corp_champ.save_fichier("corpus_article.csv")
 #corp_champ.load_fichier("corpus_article.csv")
 #corpus=pd.read_csv('corpus_article.csv', sep='\t')
 #print (corpus)
-reddit = RedditDocument(corp_champ,12)
-"""
 
-doc_Reddit.getType()
+
+
+print(doc_Reddit.getType())
 doc_Arxiv.getType()
 
 #print(Corpus() is Corpus())
