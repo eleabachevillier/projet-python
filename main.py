@@ -29,6 +29,8 @@ from DocumentFactory import Fabrique
 ############Partie 1 :
 
 #1.1
+corp_champ= Corpus ("Dans les champs")
+
 
 taille_docs=100
 #Récupération de textes depuis Reddit
@@ -64,6 +66,7 @@ for post in posts:
     
     c_documents = Document (titre,auteur,date,url,texte)#instanciation 
     doc_Reddit=RedditDocument (titre,auteur,date,url,texte, num_comments)
+    corp_champ.add (doc_Reddit)
     #documents[i]=c_documents#dictionnaire 
     documents[i]=doc_Reddit
     i=i+1    
@@ -123,9 +126,10 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
     documents[i] = c_documents2  # dictionnaire
     i = i + 1
 
+
     docs.append(texte)
     origines.append("Arxiv")
-
+    corp_champ.add(doc_Arxiv)
 
     if isinstance(auteurs_article, dict):
         auteurs_article = [auteurs_article]
@@ -195,7 +199,7 @@ df_tree=df_tree[df_tree["nb_caracteres"]>=100]
 
 
 #3.4
-chaine_join=" ".join([ligne for ligne in df_tree['text']])
+#chaine_join=" ".join([ligne for ligne in df_tree['text']])
 #print(chaine_join)
 
 
@@ -204,33 +208,32 @@ chaine_join=" ".join([ligne for ligne in df_tree['text']])
     #4.2 /4.3
 
 #print (f"toutes les informations de l'instance \n : titre {c_documents.titre}, auteur {c_documents.auteur}, date {c_documents.date}, url {c_documents.url}, texte {c_documents.texte}'\n")
-print (f"toutes les informations de l'instance \n : titre {doc_Reddit.titre}, auteur {doc_Reddit.auteur}, date {doc_Reddit.date}, url {doc_Reddit.url}, texte {doc_Reddit.texte}, nb_com {num_comments}'\n")
+#print (f"toutes les informations de l'instance \n : titre {doc_Reddit.titre}, auteur {doc_Reddit.auteur}, date {doc_Reddit.date}, url {doc_Reddit.url}, texte {doc_Reddit.texte}, nb_com {num_comments}'\n")
 
-print("manière avec __str__\n") 
 print (documents[1])
 print("Nombre de documents :", len(documents))
 
     ################Partie 5 :
     #5.2 /5.3
 
- 
-for nom, auteur in authors.items():
-    print(nom, ":", auteur.nb_docs, "documents") 
+
+#for nom, auteur in authors.items():
+#    print(nom, ":", auteur.nb_docs, "documents") 
 
  ####5.4 
-
+"""
 nom_recherche=input("Entrez le nom de l'auteur à rechercher : ")
 if nom_recherche in authors:
      auteur = authors[nom_recherche]
      print("Nombre de documents produits :", auteur.nb_docs)
 if nom_recherche not in authors:
      print ("pas trouvé")
+"""
 
-
-corp_champ= Corpus ("Dans les champs")
+#corp_champ= Corpus ("Dans les champs")
 #print(corp_champ.add(c_documents))
-print(corp_champ.add(doc_Reddit))
-print(corp_champ.add(doc_Arxiv))
+#(corp_champ.add(doc_Reddit))
+#(corp_champ.add(doc_Arxiv))
 #print(corp_champ.add(c_documents2))
 
 #print (c_documents2.url)
@@ -240,11 +243,11 @@ print(corp_champ.add(doc_Arxiv))
 
 
 
-print("id doc : ",corp_champ.id_documents)#nb docs dans le corpus selectionné
+#print("id doc : ",corp_champ.id_documents)#nb docs dans le corpus selectionné
 #marche avec reddit
 
 print (corp_champ.trie_date(corp_champ))
-print (corp_champ.trie_titre(corp_champ)) 
+#print (corp_champ.trie_titre(corp_champ)) 
 
 
 
@@ -265,3 +268,7 @@ doc_Arxiv.getType()
 doc_fab = Fabrique.document_factory("arxiv", titre, auteur, date, url, texte,
                        coauteurs=["Alice", "Bob"])
 corp_champ.add(doc_fab)
+
+
+recherche = corp_champ.search("cold")
+print (f"le texte qu'on veut est {recherche}\n\n présentation")

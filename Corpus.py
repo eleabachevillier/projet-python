@@ -1,5 +1,6 @@
 import pandas as pd
 from Author import Author
+import re 
 
 
 def singleton(cls):
@@ -117,6 +118,32 @@ class Corpus :
         return f"Corpus (nom='{self.nom}')"
 
 
+    """  
+    def search(self, mot):
+        texte = self.texte_complet() # cache
+        return re.findall(r"[^.]*\b" + mot + r"\b[^.]*", texte, re.IGNORECASE)    
+    """     
+    #def search(self, mot):
+         #ia : au premier appel, chaine_join est créée et conservée dans self, Aux appels suivants, elle est réutilisée sans être reconstruite.
+   # if not hasattr(self, "chaine_join"):
+        #self.texte = self.texte_complet()
+        #return re.findall(r"[^.]*\b" + re.escape(mot) + r"\b[^.]*",self.texte,re.IGNORECASE
+    #)
+    def search(self, mot):
+        if not hasattr(self, "chaine_join"):
+           # haine_join=" ".join(
+            self.chaine_join = " ".join(
+                doc.texte for doc in self.documents.values()
+            )
+            #return self.chaine_join
     
-        
-    
+        return re.findall(
+            r"[^.]*\b" + re.escape(mot) + r"\b[^.]*",
+            self.chaine_join,
+            re.IGNORECASE
+        )
+
+    def concordancier (self, mot):
+         search(self, mot)
+     
+     
