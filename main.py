@@ -8,8 +8,8 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from collections import Counter
-from scipy.sparse import csr_matrix
-from scipy.sparse import diags
+#from scipy.sparse import csr_matrix
+
 
 from Document import Document
 from Author import Author
@@ -17,15 +17,13 @@ from Corpus import Corpus
 from RedditDocument import RedditDocument
 from ArxivDocument import ArxivDocument
 from DocumentFactory import Fabrique
+from SearchEngine import SearchEngine
 
 
 """
 
 #uv add arxiv
 #
-
-
-
 
 """
 
@@ -95,7 +93,7 @@ for texte in docs[:5]: #affiher 5 premiers elem de la liste
 #1.2
 #« Merci à arXiv pour l’utilisation de son interopérabilité en libre accès. »
 
-
+"""
 
 url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=100'
 
@@ -148,7 +146,7 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
        
 
     
- 
+""" 
 
 ######################Partie 2 : 
     #2.1
@@ -253,7 +251,7 @@ corp_champ.save_fichier("corpus_article.csv")
 
 
 print(doc_Reddit.getType())
-doc_Arxiv.getType()
+#doc_Arxiv.getType()
 
 #print(Corpus() is Corpus())
 
@@ -261,111 +259,19 @@ doc_fab = Fabrique.document_factory("arxiv", titre, auteur, date, url, texte,
                        coauteurs=["Alice", "Bob"])
 #corp_champ.add(doc_fab)
 
-"""
-recherche = corp_champ.search("cold")
-print (f"le texte qu'on veut est {recherche}\n\n présentation")
 
-resultats = corp_champ.concorde("cold", 30)
-print (resultats)
+# Trier et afficher les 5 meilleurs documents
+#documents = list(corp_champ.documents.values())
 
-print("\n cold 2 : \n\n")
-resultats2 = corp_champ.concorde("cold", 50)
-print (resultats2)
-print("\n\ntree : \n\n")
-resultats3 = corp_champ.concorde("tree", 30)
-print (resultats3.head())
-"""
+moteur = SearchEngine(corp_champ)
 
-"""
-vocab1 = set()
-for doc in corp_champ.documents.values():
-    vocab1.update(corp_champ.nettoyer_texte(doc.texte).split())
+# 2. Demande de recherche à l'utilisateur
+requete_utilisateur = input("Que recherchez-vous ? ")
+nb_a_afficher = 5
 
-vocab1 = sorted(vocab1)
+# 3. Récupération du DataFrame de résultats
+resultats = moteur.search(requete_utilisateur, top_n=nb_a_afficher)
 
-"""
-frequences = Counter()
-document_frequency = Counter()
-
-
-for doc in corp_champ.documents.values():
-    mots = corp_champ.nettoyer_texte(doc.texte).split()
-    frequences.update(mots)
-    
-    document_frequency.update(set(mots))
-
-freq = pd.DataFrame({
-    "mot": list(frequences.keys()),
-    "term_frequency": list(frequences.values()),
-    "document_frequency": [
-        document_frequency[mot] for mot in frequences.keys()
-    ]
-})
-
-freq.sort_values('mot', ascending=True, inplace=True)   #df dans l'ordre des mots, meme si au début : nb et caractères spéciaux
-print(freq[:60])
-
-
-vocab={}
-for index, row in freq.iterrows():
-    
-    mot = row['mot'] 
-    
-    # Stockage des informations dans un sous-dictionnaire
-    vocab[mot] = {
-        "identifant": index,
-        "term_frequency": row['term_frequency'],      # Nom de colonne à adapter selon votre DataFrame
-        "document_frequency": row['document_frequency']            # Nom de colonne à adapter selon votre DataFrame
-    }
-#vocab = dict(sorted(vocab.items())) 
-vocab = dict(vocab.items())
-# #on aurait pu utiliser les variables qu'on a créer pour construire le DF (frequency), plus simple pour identifiants
-#déjà trié
-
-#print (vocab)
-
-mots_vocab = list(freq["mot"])
-
-documents = list(corp_champ.documents.values())  
-
-lignes = []
-colonnes = []
-valeurs = []
-
-for doc in corp_champ.documents.values():
-    mots = corp_champ.nettoyer_texte(doc.texte).split()
-    frequences.update(mots)
-    
-    document_frequency.update(set(mots))
-
-
-#IA
-for i, doc in enumerate(documents):
-    mots = corp_champ.nettoyer_texte(doc.texte).split() #obligé de refaire car pas le meme compte qu'avant : on compte par documents et pas dans tous le corpus
-    compteur = Counter(mots)        #pas le meme ordre je crois
-    #--->frequences c le compteur
-
-    for j, mot in enumerate(mots_vocab):
-        # 2. Vérifier la fréquence du mot dans CE document
-        if compteur[mot] > 0:        
-            lignes.append(i)
-            colonnes.append(j)
-            valeurs.append(frequences[mot])
-
-mat_TF = csr_matrix(
-    (valeurs, (lignes, colonnes)),
-    shape=(len(documents), len(mots_vocab))
-)
-#fin IA
-#print(mat_TF)
-
-
-N=len(corp_champ.documents.values())
-
-idf=np.log(N/freq['document_frequency'])
-freq["idf"]=idf
-freq["tf-idf"]=freq["idf"]*freq['term_frequency']
-print (freq.head())
-
-mat_TFxIDF = mat_TF @ diags(idf)
-print ("TF-IDF", mat_TFxIDF)
+# 4. Affichage du DataFrame final
+print("\n--- Résultats de la recherche ---")
+print(resultats)
