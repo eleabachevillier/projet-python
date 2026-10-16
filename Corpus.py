@@ -1,6 +1,7 @@
 import pandas as pd
 from Author import Author
 import re 
+import pandas as pd
 
 
 def singleton(cls):
@@ -28,19 +29,6 @@ class Corpus :
         doc_id = self.id_documents
         self.id_documents += 1
 
-        #nom = doc.auteur
-        
-       # if isinstance(doc.auteur, dict):
-         #   auteurs_article = [doc.auteur]
-        #else:
-             #auteurs_article = doc.auteur
-
-       # for auteur in auteurs_article:
-            #nom = auteur["name"] if isinstance(auteur, dict) else auteur
-            
-        #for nom in auteurs_article:
-                #auteur = nom["name"]
-
       
         if isinstance(doc.auteur, dict):
             auteurs_article = [doc.auteur["name"]]
@@ -62,12 +50,7 @@ class Corpus :
             self.authors[nom].add(doc_id, doc)
            
 
-        #if auteurs_article not in self.authors :
-
-           # self.authors[nom] = Author(nom)
-
-        #self.authors[nom].add(doc_id, doc)
-
+        
     #def trie_date(self, doc):
        # documents_tries = sorted(
       # for 
@@ -118,32 +101,72 @@ class Corpus :
         return f"Corpus (nom='{self.nom}')"
 
 
-    """  
-    def search(self, mot):
-        texte = self.texte_complet() # cache
-        return re.findall(r"[^.]*\b" + mot + r"\b[^.]*", texte, re.IGNORECASE)    
-    """     
-    #def search(self, mot):
-         #ia : au premier appel, chaine_join est créée et conservée dans self, Aux appels suivants, elle est réutilisée sans être reconstruite.
-   # if not hasattr(self, "chaine_join"):
-        #self.texte = self.texte_complet()
-        #return re.findall(r"[^.]*\b" + re.escape(mot) + r"\b[^.]*",self.texte,re.IGNORECASE
-    #)
-    def search(self, mot):
-        if not hasattr(self, "chaine_join"):
-           # haine_join=" ".join(
-            self.chaine_join = " ".join(
-                doc.texte for doc in self.documents.values()
-            )
-            #return self.chaine_join
-    
-        return re.findall(
-            r"[^.]*\b" + re.escape(mot) + r"\b[^.]*",
-            self.chaine_join,
-            re.IGNORECASE
+    def texte_complet(self):
+        return " ".join(
+            doc.texte for doc in self.documents.values()
         )
 
-    def concordancier (self, mot):
-         search(self, mot)
-     
-     
+    def texte_cache(self):
+        if not hasattr(self, "chaine_join"):
+            self.chaine_join = self.texte_complet()
+        return self.chaine_join
+
+
+
+
+    def search(self, mot):
+        texte = self.texte_cache()
+        return re.findall(r"[^.]*\b" + mot + r"\b[^.]*", texte, re.IGNORECASE)#enleve points, tous dès 0 , un grp de mot 
+
+
+   #IA
+    def concorde(self, mot, taille_contexte=30):
+        """
+        Construit un concordancier pour une expression donnée.
+        
+        Paramètres :
+        - expression (str) : Le mot ou l'expression régulière à rechercher.
+        - taille_contexte (int) : Le nombre de caractères à inclure pour le contexte 
+          de gauche et de droite (par défaut : 30).
+          
+        Retour :
+        - pandas.DataFrame : Un tableau contenant les colonnes 
+          'contexte_gauche', 'mot' et 'contexte_droite'.
+        """
+        texte = self.texte_cache()
+        lignes = []
+        pattern = r"\b" + mot + r"\b"
+
+        # re.finditer permet de parcourir toutes les occurrences avec leurs positions (span)
+        for match in re.finditer(pattern, texte, re.IGNORECASE):
+            
+            debut, fin = match.span()
+            mot = match.group(0)
+
+            # Extraction du contexte de gauche (en s'assurant de ne pas dépasser 0)
+            debut_gauche = max(0, debut - taille_contexte)
+            contexte_gauche = texte[debut_gauche:debut]
+
+            # Extraction du contexte de droite (en s'assurant de ne pas dépasser la fin du texte)
+            fin_droite = min(len(texte), fin + taille_contexte)
+            contexte_droite = texte[fin:fin_droite]
+
+            # Stockage des éléments dans une liste de dictionnaires
+            lignes.append({
+                "contexte_gauche": contexte_gauche,
+                "mot": mot,
+                "contexte_droite": contexte_droite
+            })
+
+        # Création et retour du DataFrame pandas
+        return pd.DataFrame(lignes)
+     #fin IA
+
+    def nettoyer_texte(self, chaine):
+        chaine = chaine.lower()
+        chaine = chaine.replace("\n", " ")
+        #chaine = re.sub(r"[0-9]+", " ", chaine) # supprimer les chiffres ????
+        chaine = re.sub(r"[^\w\s]", " ", chaine) # ponctuation
+        return re.sub(r"\s+", " ", chaine).strip()
+
+    

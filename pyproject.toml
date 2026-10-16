@@ -9,6 +9,8 @@ dependencies = [
     "dotenv>=0.9.9",
     "pandas>=3.0.6",
     "praw>=8.0.3",
+    "scipy>=1.18.1",
+    "spicy>=0.16.0",
     "xmltodict>=1.0.4",
 ]
 

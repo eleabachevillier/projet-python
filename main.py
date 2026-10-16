@@ -5,7 +5,11 @@ import urllib
 import urllib.request
 import xmltodict
 import pandas as pd
+import numpy as np
 from datetime import datetime
+from collections import Counter
+from scipy.sparse import csr_matrix
+from scipy.sparse import diags
 
 from Document import Document
 from Author import Author
@@ -230,18 +234,6 @@ if nom_recherche not in authors:
      print ("pas trouvé")
 """
 
-#corp_champ= Corpus ("Dans les champs")
-#print(corp_champ.add(c_documents))
-#(corp_champ.add(doc_Reddit))
-#(corp_champ.add(doc_Arxiv))
-#print(corp_champ.add(c_documents2))
-
-#print (c_documents2.url)
-
-
-#corp_champ.add(c_documents2)
-
-
 
 #print("id doc : ",corp_champ.id_documents)#nb docs dans le corpus selectionné
 #marche avec reddit
@@ -267,8 +259,113 @@ doc_Arxiv.getType()
 
 doc_fab = Fabrique.document_factory("arxiv", titre, auteur, date, url, texte,
                        coauteurs=["Alice", "Bob"])
-corp_champ.add(doc_fab)
+#corp_champ.add(doc_fab)
 
-
+"""
 recherche = corp_champ.search("cold")
 print (f"le texte qu'on veut est {recherche}\n\n présentation")
+
+resultats = corp_champ.concorde("cold", 30)
+print (resultats)
+
+print("\n cold 2 : \n\n")
+resultats2 = corp_champ.concorde("cold", 50)
+print (resultats2)
+print("\n\ntree : \n\n")
+resultats3 = corp_champ.concorde("tree", 30)
+print (resultats3.head())
+"""
+
+"""
+vocab1 = set()
+for doc in corp_champ.documents.values():
+    vocab1.update(corp_champ.nettoyer_texte(doc.texte).split())
+
+vocab1 = sorted(vocab1)
+
+"""
+frequences = Counter()
+document_frequency = Counter()
+
+
+for doc in corp_champ.documents.values():
+    mots = corp_champ.nettoyer_texte(doc.texte).split()
+    frequences.update(mots)
+    
+    document_frequency.update(set(mots))
+
+freq = pd.DataFrame({
+    "mot": list(frequences.keys()),
+    "term_frequency": list(frequences.values()),
+    "document_frequency": [
+        document_frequency[mot] for mot in frequences.keys()
+    ]
+})
+
+freq.sort_values('mot', ascending=True, inplace=True)   #df dans l'ordre des mots, meme si au début : nb et caractères spéciaux
+print(freq[:60])
+
+
+vocab={}
+for index, row in freq.iterrows():
+    
+    mot = row['mot'] 
+    
+    # Stockage des informations dans un sous-dictionnaire
+    vocab[mot] = {
+        "identifant": index,
+        "term_frequency": row['term_frequency'],      # Nom de colonne à adapter selon votre DataFrame
+        "document_frequency": row['document_frequency']            # Nom de colonne à adapter selon votre DataFrame
+    }
+#vocab = dict(sorted(vocab.items())) 
+vocab = dict(vocab.items())
+# #on aurait pu utiliser les variables qu'on a créer pour construire le DF (frequency), plus simple pour identifiants
+#déjà trié
+
+#print (vocab)
+
+mots_vocab = list(freq["mot"])
+
+documents = list(corp_champ.documents.values())  
+
+lignes = []
+colonnes = []
+valeurs = []
+
+for doc in corp_champ.documents.values():
+    mots = corp_champ.nettoyer_texte(doc.texte).split()
+    frequences.update(mots)
+    
+    document_frequency.update(set(mots))
+
+
+#IA
+for i, doc in enumerate(documents):
+    mots = corp_champ.nettoyer_texte(doc.texte).split() #obligé de refaire car pas le meme compte qu'avant : on compte par documents et pas dans tous le corpus
+    compteur = Counter(mots)        #pas le meme ordre je crois
+    #--->frequences c le compteur
+
+    for j, mot in enumerate(mots_vocab):
+        # 2. Vérifier la fréquence du mot dans CE document
+        if compteur[mot] > 0:        
+            lignes.append(i)
+            colonnes.append(j)
+            valeurs.append(frequences[mot])
+
+mat_TF = csr_matrix(
+    (valeurs, (lignes, colonnes)),
+    shape=(len(documents), len(mots_vocab))
+)
+#fin IA
+#print(mat_TF)
+
+
+N=len(corp_champ.documents.values())
+
+idf=np.log(N/freq['document_frequency'])
+freq["idf"]=idf
+freq["tf-idf"]=freq["idf"]*freq['term_frequency']
+print (freq.head())
+
+mat_TFxIDF = mat_TF @ diags(idf)
+print ("TF-IDF", mat_TFxIDF)

@@ -5,3 +5,4 @@ origines = [] <--origine de tous les docs
 
  # uv add concordancier
  # uv add pandas 
+ # uv add scipy
