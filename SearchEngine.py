@@ -8,19 +8,18 @@ class SearchEngine:
     def __init__(self, corp_champ):
         self.corp_champ = corp_champ
         self.documents = list(corp_champ.documents.values())
-        #self._construire() # vocab + mat_TF + mat_TFxIDF
         self.N = len(self.documents)
     
 
+        #pour avoir le nombre de mots et de documents et tableau nombre de documents ayant le mot (tf, df)
         frequences = Counter()
         document_frequency = Counter()
 
-
         for doc in self.corp_champ.documents.values():
-            mots = self.corp_champ.nettoyer_texte(doc.texte).split()
+            mots = self.corp_champ.nettoyer_texte(doc.texte).split() #decouper le texte
             frequences.update(mots)
             
-            document_frequency.update(set(mots))
+            document_frequency.update(set(mots)) 
 
         self.freq = pd.DataFrame({
             "mot": list(frequences.keys()),
@@ -31,25 +30,28 @@ class SearchEngine:
         self.freq.sort_values('mot', ascending=True, inplace=True)   #df dans l'ordre des mots, meme si au début : nb et caractères spéciaux
         self.freq.reset_index(drop=True, inplace=True)
         #print(freq[:60])
-        """
+       
+       #pour avoir un dictionnaire avec les mots de vocabulaire
+       #IA
         vocab={}
-        for index, row in freq.iterrows():
+        for index, row in self.freq.iterrows(): #Parcourir les lignes du DataFrame sous forme de paires (index, Series).
             
             mot = row['mot'] 
             
             # Stockage des informations dans un sous-dictionnaire
             vocab[mot] = {
                 "identifant": index,
-                "term_frequency": row['term_frequency'],      # Nom de colonne à adapter selon votre DataFrame
-                "document_frequency": row['document_frequency']            # Nom de colonne à adapter selon votre DataFrame
+                "term_frequency": row['term_frequency'],     
+                "document_frequency": row['document_frequency']           
             }
-        #vocab = dict(sorted(vocab.items())) 
+        #Fin IA
+     
         vocab = dict(vocab.items())
         # #on aurait pu utiliser les variables qu'on a créer pour construire le DF (frequency), plus simple pour identifiants
         #déjà trié
 
-        #print (vocab)
-        """
+        
+        
         self.mots_vocab = list(self.freq["mot"])
         self.documents = list(corp_champ.documents.values())  
         self.mots_presents = {mot: i for i, mot in enumerate(self.mots_vocab)}#dictionnaire des mots avec id
@@ -71,39 +73,37 @@ class SearchEngine:
                     lignes.append(i)    
                     colonnes.append(j)
                     valeurs.append(compteur[mot])
-
+        #fin IA
+        #caldul de la matrice tf (similaire au dataframe)
         self.mat_TF = csr_matrix(
             (valeurs, (lignes, colonnes)),
             shape=(len(self.documents), len(self.mots_vocab))
         )
-        #fin IA
+        
         #print(mat_TF)
 
 
-        #N=len(corp_champ.documents.values())
-        self.idf=np.log(self.N/self.freq['document_frequency'])
-        self.freq["idf"]=self.idf
-        self.freq["tf-idf"]=self.freq["idf"]*self.freq['term_frequency']
-        #print (freq.head())
-
+        self.idf=np.log(self.N/self.freq['document_frequency']) #calculer idf , inverse de df
+        self.freq["idf"]=self.idf #on peut l'ajouter ua dataframe freq
+        self.freq["tf-idf"]=self.freq["idf"]*self.freq['term_frequency'] #calcule du td ifd pour le dataframe
+        
+        #calcul de la matrice tfxidf -->fréquence d'un terme dans un doc par rapport à l'ensemble des document (permet d'éviter le "bruit")
         self.mat_TFxIDF = self.mat_TF @ diags(self.idf)
-        #print ("TF-IDF", mat_TFxIDF)
+        #IA
         self.normes_docs = np.sqrt(np.asarray(self.mat_TFxIDF.multiply(self.mat_TFxIDF).sum(axis=1)).ravel())
+        #Fin IA
 
 
-
-    #requete = input("Que recherchez-vous ? ")
-
+    #fonction de recherche d'une requete utilisateur
     def search(self, requete, top_n=5):
         mots_rq = self.corp_champ.nettoyer_texte(requete).split()
 
-        #vocab = dict(vocab.items())
-
+       
         # Construire le vecteur TF de la requête
-        vecteur = np.zeros(len(self.mots_vocab))#tableau de 0 de taille mot_vocab
+        vecteur = np.zeros(len(self.mots_vocab))    #initialisation d'un tableau de 0 de taille mot_vocab
         for mot in mots_rq:
             if mot in self.mots_presents:
-                vecteur[self.mots_presents[mot]] += 1
+                vecteur[self.mots_presents[mot]] += 1       #on met a jour le tableau
 
         # Appliquer les poids IDF
         vecteur = vecteur * self.idf
@@ -129,7 +129,7 @@ class SearchEngine:
 
 
         # Trier et afficher les 5 meilleurs documents
-        #documents = list(corp_champ.documents.values())
+        
         ordre = np.argsort(scores)[::-1]
 
         resultats_data = []
@@ -140,6 +140,6 @@ class SearchEngine:
                     "titre": self.documents[i].titre,
                     "document": self.documents[i]
                 })
-        return pd.DataFrame(resultats_data)
+        return pd.DataFrame(resultats_data) #return le document dans un DF
   
 

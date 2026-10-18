@@ -20,18 +20,14 @@ from DocumentFactory import Fabrique
 from SearchEngine import SearchEngine
 
 
-"""
-
-#uv add arxiv
-#
-
-"""
 
 ##############################   PARTIE I :   ##################
 ############Partie 1 :
 
 #1.1
+#instance de la classe Corpus
 corp_champ= Corpus ("Dans les champs")
+
 
 
 taille_docs=100
@@ -66,34 +62,24 @@ for post in posts:
     docs.append(texte) #mettre dans liste
     origines.append('reddit')
     
-    c_documents = Document (titre,auteur,date,url,texte)#instanciation 
-    doc_Reddit=RedditDocument (titre,auteur,date,url,texte, num_comments)
-    corp_champ.add (doc_Reddit)
-    #documents[i]=c_documents#dictionnaire 
+    c_documents = Document (titre,auteur,date,url,texte) #instanciation classe document
+    doc_Reddit=RedditDocument (titre,auteur,date,url,texte, num_comments) #instanciation classe RedditDocument
+    corp_champ.add (doc_Reddit) #ajout d'un docuent dans le corpus
+   
     documents[i]=doc_Reddit
     i=i+1    
     
-    if auteur not in authors : ##on fait en 2 fois car plusieurs auteurs pour arxiv et bug
-            authors[auteur] = Author(auteur) #on met l'instance en value de la key auteur (auteur correspondant à l'instance)
+    if auteur not in authors : # on fait en 2 fois car plusieurs auteurs pour arxiv et bug
+            authors[auteur] = Author(auteur) # on met l'instance en value de la key auteur (auteur correspondant à l'instance)
     
     authors[auteur].add(i, c_documents)
    
-    
-
-   
-    
 
 
-"""
-for texte in docs[:5]: #affiher 5 premiers elem de la liste
-    print("\n---")
-    print(texte)
-    #exit()
-"""
 #1.2
 #« Merci à arXiv pour l’utilisation de son interopérabilité en libre accès. »
 
-"""
+#recupération des documents Arxiv
 
 url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=100'
 
@@ -102,7 +88,7 @@ donnees = data.read().decode('utf-8')
 
 resultat = xmltodict.parse(donnees)  # en liste
 
-for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut le texte uniquement
+for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre
     titre = article["title"]
     auteurs_article = article["author"]
     #date = datetime.fromtimestamp(article["published"])  
@@ -117,9 +103,7 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
         noms = a["name"]
     auteur = noms[0]
     coauteurs = noms[1:]
-    #noms = [a["name"] for a in auteurs_article] #pour mettre dans auteur et dans les coauteurs
-    #auteur = noms[0]
-    #coauteurs = noms[1:]
+  
     
 
     doc_Arxiv = ArxivDocument(titre,auteurs_article, date, url, texte,coauteurs)#coauteurs
@@ -131,26 +115,27 @@ for article in resultat["feed"]["entry"]:  # on se balade dans l'arbre, on veut 
 
     docs.append(texte)
     origines.append("Arxiv")
-    corp_champ.add(doc_Arxiv)
+    corp_champ.add(doc_Arxiv) #on ajoute le document au corpus
 
     if isinstance(auteurs_article, dict):
         auteurs_article = [auteurs_article]
 
-    for nom in auteurs_article:
+    for nom in auteurs_article: #pour le dictionnaire des auteurs
         auteur = nom["name"]
 
         if auteur not in authors:
-            authors[auteur] = Author(auteur)
+            authors[auteur] = Author(auteur)    #disctionnaire autheur avec la classe Autor
                  
         authors[auteur].add(i, c_documents)
        
 
     
-""" 
+
 
 ######################Partie 2 : 
     #2.1
 
+#DataFrame avec les documents
 id=[]
 for i in range (len(docs)) :
         id.append(i)
@@ -161,8 +146,6 @@ print(df)
 df.to_csv('articles_tree.csv', sep='\t', index=False)
 
 #2.3
-
-
 df_tree=pd.read_csv('articles_tree.csv', sep='\t')
 
 
@@ -174,18 +157,11 @@ taille=(len(df_tree))
 print (f"taille du corpus : {taille}") ##############verif que fonctionne
 
 #3.2
-for ligne in df_tree['text'] :   
+for ligne in df_tree['text'] :   #séparer le texte
     if pd.notna(ligne):  # Vérifie si la ligne n'est pas vide
         mot = ligne.split(" ")
-        #print('mot',len(mot))
-
         phrases=ligne.split(".")
-        #print('phrases',len(phrases))
-    #else:
-        #print('ligne vide')
-
-
-    #print('caractère',len(ligne),'\n')
+        
     
 #3.3
 for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
@@ -195,10 +171,7 @@ for i, ligne in enumerate(df_tree['text']): #pour ajouter ligne par ligne
         df_tree.loc[i, "nb_caracteres"] = 0
 
 
-
 df_tree=df_tree[df_tree["nb_caracteres"]>=100]
-#print(df_tree)
-
 
 #3.4
 #chaine_join=" ".join([ligne for ligne in df_tree['text']])
@@ -215,7 +188,7 @@ df_tree=df_tree[df_tree["nb_caracteres"]>=100]
 print (documents[1])
 print("Nombre de documents :", len(documents))
 
-    ################Partie 5 :
+    ################Partie 5 
     #5.2 /5.3
 
 
@@ -223,21 +196,19 @@ print("Nombre de documents :", len(documents))
 #    print(nom, ":", auteur.nb_docs, "documents") 
 
  ####5.4 
-"""
+
+#pour rechercher un auteur ( ! mais ca ne fonctionne pas !)
 nom_recherche=input("Entrez le nom de l'auteur à rechercher : ")
 if nom_recherche in authors:
      auteur = authors[nom_recherche]
      print("Nombre de documents produits :", auteur.nb_docs)
 if nom_recherche not in authors:
      print ("pas trouvé")
-"""
 
 
-#print("id doc : ",corp_champ.id_documents)#nb docs dans le corpus selectionné
-#marche avec reddit
 
 print (corp_champ.trie_date(corp_champ))
-#print (corp_champ.trie_titre(corp_champ)) 
+print (corp_champ.trie_titre(corp_champ)) 
 
 
 
@@ -251,27 +222,28 @@ corp_champ.save_fichier("corpus_article.csv")
 
 
 print(doc_Reddit.getType())
-#doc_Arxiv.getType()
+print(doc_Arxiv.getType())
 
-#print(Corpus() is Corpus())
 
+#tester la classe Fabrique, où on peut mettre des documents arxiv et reddit
 doc_fab = Fabrique.document_factory("arxiv", titre, auteur, date, url, texte,
                        coauteurs=["Alice", "Bob"])
 #corp_champ.add(doc_fab)
 
 
-# Trier et afficher les 5 meilleurs documents
-#documents = list(corp_champ.documents.values())
+
+
+#moteur de recherche 
 
 moteur = SearchEngine(corp_champ)
 
-# 2. Demande de recherche à l'utilisateur
-requete_utilisateur = input("Que recherchez-vous ? ")
+# Demande de recherche à l'utilisateur
+requete_utilisateur = input("Que voulez-vous rechercher ? ")
 nb_a_afficher = 5
 
-# 3. Récupération du DataFrame de résultats
+#Récupération du DataFrame de résultats
 resultats = moteur.search(requete_utilisateur, top_n=nb_a_afficher)
 
-# 4. Affichage du DataFrame final
+# Affichage du DataFrame final
 print("\n--- Résultats de la recherche ---")
 print(resultats)

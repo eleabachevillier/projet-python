@@ -4,6 +4,7 @@ import re
 import pandas as pd
 
 
+#fonction singleton pour pouvoir initialiser une seule fois
 def singleton(cls):
     instance = [None]
     def wrapper(*args, **kwargs):
@@ -23,13 +24,14 @@ class Corpus :
         self.id_documents = 0
         self.authors = {}
 
+    #ajouter document
     def add(self, doc) :
         self.documents[self.id_documents] = doc
 
         doc_id = self.id_documents
         self.id_documents += 1
 
-      
+      #pour quand il y a plusieurs autheurs (arxiv)
         if isinstance(doc.auteur, dict):
             auteurs_article = [doc.auteur["name"]]
         elif isinstance(doc.auteur, list):
@@ -51,12 +53,7 @@ class Corpus :
            
 
         
-    #def trie_date(self, doc):
-       # documents_tries = sorted(
-      # for 
-            #document.date = sorted) <--on n'a pas les dates dans le meme dichoer et trie les dates, pas les docs...
-    
-    #IA  
+       #IA  
     def trie_date(self, doc):
             documents_tries = sorted(
             self.documents.items(),
@@ -119,10 +116,9 @@ class Corpus :
         return re.findall(r"[^.]*\b" + mot + r"\b[^.]*", texte, re.IGNORECASE)#enleve points, tous dès 0 , un grp de mot 
 
 
-   #IA
+   #IA 
     def concorde(self, mot, taille_contexte=30):
-        """
-        Construit un concordancier pour une expression donnée.
+        """      
         
         Paramètres :
         - expression (str) : Le mot ou l'expression régulière à rechercher.
