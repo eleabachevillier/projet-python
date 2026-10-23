@@ -50,8 +50,7 @@ class Corpus :
                 self.authors[nom] = Author(nom)
 
             self.authors[nom].add(doc_id, doc)
-           
-
+     
         
        #IA  
     def trie_date(self, doc):
@@ -83,6 +82,7 @@ class Corpus :
                 "date": doc.date,
                 "url": doc.url,
                 "texte": doc.texte
+                #"specialite":
                 # df=pd.DataFrame({ "identifiant ": id, "text" : docs, "origine": origines})
             })
     
@@ -90,8 +90,11 @@ class Corpus :
 
         df.to_csv(fichier, index=False)
     
-    #def load_fichier(fichier):
+    def load_fichier(fichier):
+        #corpus=pd.read_csv('articles_tree.csv', sep='\t')
         corpus=pd.read_csv('articles_tree.csv', sep='\t')
+
+        return corpus
 
 
     def __repr__(self):

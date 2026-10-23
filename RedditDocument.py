@@ -11,7 +11,7 @@ class RedditDocument(Document): # hérite de Animal
     def setnb_commentaires(self):
         set.nb_commentaires = nb_commentaires
 
-    def crier(self): # surcharge (override)
+    def __str__(self): # surcharge (override)
          return f"[Reddit] {self.titre} - {self.nb_commentaires} commentaires"#mise en forme
 
     def getType(self):
