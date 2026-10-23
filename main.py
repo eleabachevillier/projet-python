@@ -30,7 +30,7 @@ corp_champ= Corpus ("Dans les champs")
 
 
 
-taille_docs=100
+taille_docs=3000
 #Récupération de textes depuis Reddit
 reddit = praw.Reddit(
     client_id='m4W3R1MLvrnNI9LTbG35Eg', 
@@ -81,7 +81,7 @@ for post in posts:
 
 #recupération des documents Arxiv
 
-url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=100'
+url = 'https://export.arxiv.org/api/query?search_query=all:tree&start=0&max_results=1000'
 
 data = urllib.request.urlopen(url)  # on appel l'API, permet de faire une requette HTTP
 donnees = data.read().decode('utf-8')
