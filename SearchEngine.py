@@ -3,6 +3,7 @@ import pandas as pd
 from collections import Counter
 from scipy.sparse import csr_matrix
 from scipy.sparse import diags 
+from tqdm import tqdm #uv add
 
 class SearchEngine:
     def __init__(self, corp_champ):
@@ -62,7 +63,7 @@ class SearchEngine:
 
 
         #IA
-        for i, doc in enumerate(self.documents):
+        for i, doc in enumerate(tqdm(self.documents, desc="Construction de la matrice")):
             mots = self.corp_champ.nettoyer_texte(doc.texte).split() #obligé de refaire car pas le meme compte qu'avant : on compte par documents et pas dans tous le corpus
             compteur = Counter(mots)        #pas le meme ordre je crois
             #--->frequences c le compteur
@@ -113,7 +114,7 @@ class SearchEngine:
         
         #IA
         norme_requete = np.linalg.norm(vecteur)
-        print ("\n\n\n norme requete :", norme_requete)
+        #print ("\n\n\n norme requete :", norme_requete)
 
         scores = np.zeros(len(produits))#tab 0 de taille tf idf+vecteur(mots, 1)
         if norme_requete != 0:

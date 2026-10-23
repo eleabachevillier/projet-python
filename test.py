@@ -4,7 +4,7 @@ x = txt.split()
 
 print(x)
 
-
+#display(resultats) 
 """
 recherche = corp_champ.search("cold")
 print (f"le texte qu'on veut est {recherche}\n\n présentation")
