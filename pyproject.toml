@@ -7,6 +7,8 @@ requires-python = ">=3.14"
 dependencies = [
     "concordancer>=0.1.16",
     "dotenv>=0.9.9",
+    "ipywidgets>=8.1.9",
+    "jupyterlab-widgets>=3.0.17",
     "pandas>=3.0.6",
     "praw>=8.0.3",
     "scipy>=1.18.1",

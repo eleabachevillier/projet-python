@@ -7,3 +7,5 @@ origines = [] <--origine de tous les docs
  # uv add pandas 
  # uv add scipy
  # uv add tqdm 
+ # uv add ipwidget 
+ # uv add jupyterlab_widgets
