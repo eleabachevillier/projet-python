@@ -138,8 +138,8 @@ class SearchEngine:
             if scores[i] > 0:
                 resultats_data.append({
                     "score": scores[i],
-                    "titre": self.documents[i].titre,
-                    "document": self.documents[i]
+                    "titre": self.documents[i],
+                    "document": self.documents[i].texte
                 })
         return pd.DataFrame(resultats_data) #return le document dans un DF
   
