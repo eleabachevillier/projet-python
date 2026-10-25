@@ -8,4 +8,8 @@ origines = [] <--origine de tous les docs
  # uv add scipy
  # uv add tqdm 
  # uv add ipwidget 
- # uv add jupyterlab_widgets
+ # uv add streamlit
+ -->interface : streamlit run file_name.py
+ uv run streamlit run streamlit.py
+
+ # uv add WordCloud

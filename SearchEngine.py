@@ -86,8 +86,7 @@ class SearchEngine:
 
         self.idf=np.log(self.N/self.freq['document_frequency']) #calculer idf , inverse de df
         self.freq["idf"]=self.idf #on peut l'ajouter ua dataframe freq
-        self.freq["tf-idf"]=self.freq["idf"]*self.freq['term_frequency'] #calcule du td ifd pour le dataframe
-        
+        self.freq["tf-idf"]=self.freq["idf"]*self.freq['term_frequency'] #calcule du td ifd pour le dataframe 
         #calcul de la matrice tfxidf -->fréquence d'un terme dans un doc par rapport à l'ensemble des document (permet d'éviter le "bruit")
         self.mat_TFxIDF = self.mat_TF @ diags(self.idf)
         #IA
