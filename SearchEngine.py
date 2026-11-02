@@ -95,7 +95,7 @@ class SearchEngine:
 
 
     #fonction de recherche d'une requete utilisateur
-    def search(self, requete, top_n=5):
+    def search(self, requete, top_n):
         mots_rq = self.corp_champ.nettoyer_texte(requete).split()
 
        
