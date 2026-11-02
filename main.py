@@ -19,7 +19,6 @@ from ArxivDocument import ArxivDocument
 from DocumentFactory import Fabrique
 from SearchEngine import SearchEngine
 
-print ("ok")
 
 ##############################   PARTIE I :   ##################
 ############Partie 1 :
