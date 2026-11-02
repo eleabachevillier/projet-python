@@ -1,28 +1,27 @@
-docs : liste ou est stocké le texte de tous les documents -->permet ensuite de faire DF
-origines = [] <--origine de tous les docs
- documents[i] : dictionnaire ou i = id du docs et le reste correspond à l'instance de la classe (possiblement fille)-->tous les documents avec metadonnées
+# Initialisation du moteur de recherche
 
-# uv add praw
-# uv add urllib
-import urllib.request
-# uv add xmltodict
-# uv add pandas as pd
-# uv add numpy as np
-# uv add datetime import datetime
-# uv add collections import Counter
-# uv add scipy.sparse import csr_matrix
-# uv add re 
+Pour voir les versions rendues, dans le terminal faire git tag -n.  
+Sinon, aller sur git hub et télécharcher les fichier zip correspondants.
 
+## .Venv
+Le .vnv, qui contenait la version 3.14 de pyton a été modifié pour utiliser le 3.13. On peut connecter le kernel à cet environnement pour que tout soit fonctionnel.
 
- # uv add concordancier
- # uv add pandas 
- # uv add scipy
+# Liste des bibliothèques
+### faire uv add dans le terminal (ou  utiliser pip)
+#### uv add praw
+#### uv add urllib
+#### uv add xmltodict
+#### uv add pandas as pd
 
- # uv add tqdm 
- # uv add ipwidget
- from tqdm import tqdm 
- # uv add streamlit
- -->interface : streamlit run file_name.py
+#### uv add datetime
+#### uv add collections 
+#### uv add scipy
+#### uv add re 
+#### uv add concordancier
+#### uv add tqdm 
+#### uv add ipwidget
+#### uv add streamlit
+ --> interface : streamlit run file_name.py  
+ Dans le terminal :  
  uv run streamlit run streamlit.py
 
- # uv add WordCloud
