@@ -19,7 +19,7 @@ from ArxivDocument import ArxivDocument
 from DocumentFactory import Fabrique
 from SearchEngine import SearchEngine
 
-
+print ("ok")
 
 ##############################   PARTIE I :   ##################
 ############Partie 1 :
@@ -27,7 +27,6 @@ from SearchEngine import SearchEngine
 #1.1
 #instance de la classe Corpus
 corp_champ= Corpus ("Dans les champs")
-
 
 
 taille_docs=3000
